@@ -16,19 +16,23 @@ Route::get('app/dashboard', [StarterkitController::class, 'dashboard'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::get('app/starterkit/create', [StarterkitController::class, 'create'])
-    ->middleware(['auth', 'verified'])
-    ->name('starterkit.create');
-
-Route::post('/app/starterkit', [StarterkitController::class, 'store'])
-    ->middleware(['auth', 'verified'])
-    ->name('starterkit.store');
+// Starterkit resource routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('app/starterkit/create', [StarterkitController::class, 'create'])
+        ->name('starterkit.create');
+    Route::post('/app/starterkit', [StarterkitController::class, 'store'])
+        ->name('starterkit.store');
+    Route::get('app/starterkit/{starterkit}/edit', [StarterkitController::class, 'edit'])
+        ->name('starterkit.edit');
+    Route::put('app/starterkit/{starterkit}', [StarterkitController::class, 'update'])
+        ->name('starterkit.update');
+    Route::delete('app/starterkit/{starterkit}', [StarterkitController::class, 'destroy'])
+        ->name('starterkit.destroy');
+});
 
 Route::get('app/starterkits', [StarterkitController::class, 'index'])
     ->name('starterkit.index');
-
 Route::get('/starterkits/load-more', [StarterkitController::class, 'loadMore']);
-
 Route::get('/api/starterkits/load-more', [StarterkitController::class, 'loadMore']);
 
 require __DIR__.'/settings.php';
