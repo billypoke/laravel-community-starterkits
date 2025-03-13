@@ -16,12 +16,17 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 
 const props = defineProps<{
   starterkits: Array<{
     id: string;
     url: string;
     created_at: string;
+    tags: Array<{
+      id: number;
+      name: string;
+    }>;
   }>;
 }>();
 
@@ -64,6 +69,7 @@ const closeDialog = () => {
 };
 </script>
 <template>
+
   <Head title="Dashboard" />
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -72,13 +78,13 @@ const closeDialog = () => {
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold">My Starterkits</h2>
           <Link :href="route('starterkit.create')">
-            <Button>Add Starterkit</Button>
+          <Button>Add Starterkit</Button>
           </Link>
         </div>
         <div v-if="starterkits.length === 0" class="p-4 text-center">
           <p class="text-gray-500 mb-4">You haven't added any starterkits yet.</p>
           <Link :href="route('starterkit.create')">
-            <Button>Add Your First Starterkit</Button>
+          <Button>Add Your First Starterkit</Button>
           </Link>
         </div>
         <div v-else class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -90,17 +96,19 @@ const closeDialog = () => {
                 </a>
               </CardTitle>
               <DropdownMenu>
-                <DropdownMenuTrigger as="button" class="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
+                <DropdownMenuTrigger as="button"
+                  class="h-8 w-8 inline-flex items-center justify-center rounded-md hover:bg-gray-100 dark:hover:bg-gray-700">
                   <EllipsisVertical class="h-4 w-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem as="div">
                     <Link :href="route('starterkit.edit', kit.id)" class="flex w-full items-center">
-                      <Pencil class="mr-2 h-4 w-4" />
-                      Edit
+                    <Pencil class="mr-2 h-4 w-4" />
+                    Edit
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem @click="confirmDelete(kit.id)" class="text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300">
+                  <DropdownMenuItem @click="confirmDelete(kit.id)"
+                    class="text-red-600 dark:text-red-400 focus:text-red-700 dark:focus:text-red-300">
                     <Trash2 class="mr-2 h-4 w-4" />
                     Delete
                   </DropdownMenuItem>
@@ -108,6 +116,11 @@ const closeDialog = () => {
               </DropdownMenu>
             </CardHeader>
             <CardContent>
+              <div class="flex flex-wrap gap-2 mb-2">
+                <Badge v-for="tag in kit.tags" :key="tag.id" variant="secondary" class="text-xs">
+                  {{ tag.name }}
+                </Badge>
+              </div>
               <p class="text-sm text-gray-500">
                 Added on {{ formatDate(kit.created_at) }}
               </p>
