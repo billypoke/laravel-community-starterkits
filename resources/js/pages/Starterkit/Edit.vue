@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-vue-next';
+import { useGithubValidation } from '@/composables/useGithubValidation';
 
 const props = defineProps<{
   starterkit: {
@@ -20,8 +21,12 @@ const form = useForm({
   url: props.starterkit.url,
 });
 
-const submit = () => {
-  form.put(route('starterkit.update', props.starterkit.id));
+const { isValidating, validationError, validateGithubUrl } = useGithubValidation();
+
+const submit = async () => {
+  if (await validateGithubUrl(form.url)) {
+    form.put(route('starterkit.update', props.starterkit.id));
+  }
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -60,6 +65,10 @@ const breadcrumbs: BreadcrumbItem[] = [
                   <AlertCircle class="h-4 w-4" />
                   <AlertDescription>{{ form.errors.url }}</AlertDescription>
                 </Alert>
+                <Alert v-if="validationError" variant="destructive" class="mt-2">
+                  <AlertCircle class="h-4 w-4" />
+                  <AlertDescription>{{ validationError }}</AlertDescription>
+                </Alert>
               </div>
             </div>
           </CardContent>
@@ -74,9 +83,10 @@ const breadcrumbs: BreadcrumbItem[] = [
             </Button>
             <Button
               type="submit"
-              :disabled="form.processing"
+              :disabled="form.processing || isValidating"
             >
-              Update Starterkit
+              <span v-if="isValidating">Validating...</span>
+              <span v-else>Update Starterkit</span>
             </Button>
           </CardFooter>
         </form>

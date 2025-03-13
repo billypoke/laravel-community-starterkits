@@ -2,18 +2,22 @@
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, useForm } from '@inertiajs/vue3';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useGithubValidation } from '@/composables/useGithubValidation';
 
 const form = useForm({
   url: '',
 });
 
-const handleSubmit = () => {
-  form.post(route('starterkit.store'));
+const { isValidating, validationError, validateGithubUrl } = useGithubValidation();
+
+const handleSubmit = async () => {
+  if (await validateGithubUrl(form.url)) {
+    form.post(route('starterkit.store'));
+  }
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -36,7 +40,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         <CardHeader>
           <CardTitle>Create New Starterkit</CardTitle>
         </CardHeader>
-
         <CardContent>
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div class="space-y-2">
@@ -45,10 +48,15 @@ const breadcrumbs: BreadcrumbItem[] = [
               <div v-if="form.errors.url" class="text-red-500 text-sm mt-1">
                 {{ form.errors.url }}
               </div>
+              <div v-if="validationError" class="text-red-500 text-sm mt-1">
+                {{ validationError }}
+              </div>
             </div>
-
             <div>
-              <Button type="submit" :disabled="form.processing">Submit</Button>
+              <Button type="submit" :disabled="form.processing || isValidating">
+                <span v-if="isValidating">Validating...</span>
+                <span v-else>Submit</span>
+              </Button>
             </div>
           </form>
         </CardContent>
