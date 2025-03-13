@@ -145,7 +145,7 @@ onUnmounted(() => {
                 </a>
               </h3>
               <p class="text-sm text-gray-500 mt-1">
-                Added by {{ kit.user.name }} on {{ formatDate(kit.created_at) }}
+                Added on {{ formatDate(kit.created_at) }}
               </p>
             </div>
             <div class="mt-4 md:mt-0">
