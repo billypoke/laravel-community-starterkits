@@ -12,7 +12,8 @@ return new class extends Migration
         public function up(): void
         {
             Schema::create('starterkits', function (Blueprint $table) {
-                $table->id();
+                $table->uuid('id')->primary();
+                $table->foreignId('user_id')->constrained();
                 $table->string("url");
                 $table->timestamps();
             });
