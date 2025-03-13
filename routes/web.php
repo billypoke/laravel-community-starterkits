@@ -1,14 +1,9 @@
 <?php
 
 use App\Http\Controllers\StarterkitController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::get('/', function () {
-    if (Auth::check()) {
-        return Inertia::render('Welcome');
-    }
     return redirect()->route('starterkit.index');
 })->name('home');
 
