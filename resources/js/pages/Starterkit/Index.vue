@@ -5,8 +5,10 @@ import { Head, Link, router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import BookmarkButton from '@/components/BookmarkButton.vue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import axios from 'axios';
+import StarterkitCard from '@/components/StarterkitCard.vue';
 
 const props = defineProps<{
   starterkits: {
@@ -134,6 +136,7 @@ const filterStarterkits = async () => {
 </script>
 
 <template>
+
   <Head title="Starterkits Gallery" />
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -203,44 +206,7 @@ const filterStarterkits = async () => {
 
       <!-- List view instead of grid -->
       <div v-else class="space-y-4">
-        <Card v-for="kit in loadedStarterkits" :key="kit.id" class="w-full">
-          <div class="flex flex-col md:flex-row md:items-center p-4">
-            <div class="flex-1">
-              <h3 class="font-medium text-lg">
-                <a :href="kit.url" target="_blank" class="hover:underline text-blue-600 dark:text-blue-400">
-                  {{ kit.url.replace('https://github.com/', '') }}
-                </a>
-              </h3>
-              <div class="flex flex-wrap gap-2 mt-2">
-                <Badge v-for="tag in kit.tags" :key="tag.id" variant="secondary" class="text-xs">
-                  {{ tag.name }}
-                </Badge>
-              </div>
-              <p class="text-sm text-gray-500 mt-2">
-                Added on {{ formatDate(kit.created_at) }}
-              </p>
-            </div>
-            <div class="mt-4 md:mt-0">
-              <Button variant="outline" as="a" :href="kit.url" target="_blank" class="w-full md:w-auto">
-                View Repository
-              </Button>
-            </div>
-          </div>
-        </Card>
-
-        <!-- Loading indicator -->
-        <div v-if="isLoading" class="py-4 text-center">
-          <div
-            class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"
-            role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-        </div>
-
-        <!-- End of list message -->
-        <div v-if="!hasMorePages && loadedStarterkits.length > 0" class="py-4 text-center text-gray-500">
-          You've reached the end of the list.
-        </div>
+        <StarterkitCard v-for="kit in loadedStarterkits" :key="kit.id" :starterkit="kit" :show-bookmark="isLoggedIn" />
       </div>
     </div>
   </AppLayout>
