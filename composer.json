@@ -13,6 +13,7 @@
         "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "sentry/sentry-laravel": "^4.13",
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
@@ -61,6 +62,15 @@
             "npm run build:ssr",
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"php artisan inertia:start-ssr\" --names=server,queue,logs,ssr"
+        ],
+        "clear": [
+            "@php artisan view:clear",
+            "@php artisan route:clear",
+            "@php artisan cache:clear"
+        ],
+        "clean-dev":[
+            "composer run clear",
+            "composer run dev"
         ]
     },
     "extra": {

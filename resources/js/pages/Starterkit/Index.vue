@@ -4,8 +4,11 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import BookmarkButton from '@/components/BookmarkButton.vue';
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import axios from 'axios';
+import StarterkitCard from '@/components/StarterkitCard.vue';
 
 const props = defineProps<{
   starterkits: {
@@ -16,6 +19,10 @@ const props = defineProps<{
         id: number;
         name: string;
       };
+      tags: Array<{
+        id: number;
+        name: string;
+      }>;
       created_at: string;
     }>;
     current_page: number;
@@ -26,6 +33,10 @@ const props = defineProps<{
   auth: {
     user: any | null;
   };
+  tags: Array<{
+    id: number;
+    name: string;
+  }>;
 }>();
 
 const isLoggedIn = !!props.auth.user;
@@ -58,7 +69,12 @@ const loadMoreStarterkits = async () => {
   isLoading.value = true;
   try {
     const nextPage = currentPage.value + 1;
-    const response = await axios.get(`/api/starterkits/load-more?page=${nextPage}`);
+    const response = await axios.get('/api/starterkits/load-more', {
+      params: {
+        page: nextPage,
+        tags: selectedTags.value
+      }
+    });
 
     const newStarterkits = response.data.data;
     loadedStarterkits.value = [...loadedStarterkits.value, ...newStarterkits];
@@ -94,14 +110,39 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
 });
+
+const selectedTags = ref<number[]>([]);
+
+const filterStarterkits = async () => {
+  isLoading.value = true;
+  try {
+    const response = await axios.get('/api/starterkits/load-more', {
+      params: {
+        page: 1,
+        tags: selectedTags.value
+      }
+    });
+
+    loadedStarterkits.value = response.data.data;
+    currentPage.value = response.data.current_page;
+    hasMorePages.value = currentPage.value < response.data.last_page;
+  } catch (error) {
+    console.error('Error filtering starterkits:', error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
 </script>
 
 <template>
+
   <Head title="Starterkits Gallery" />
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
       <!-- Sign Up Banner for guests -->
-      <div v-if="!isLoggedIn" class="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
+      <div v-if="!isLoggedIn"
+        class="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
         <div class="flex items-start">
           <div class="flex-1">
             <h3 class="text-lg font-medium text-blue-800 dark:text-blue-300">Welcome to Laravel Starterkits!</h3>
@@ -111,9 +152,10 @@ onUnmounted(() => {
           </div>
           <div class="ml-4">
             <Link :href="route('register')">
-              <Button size="sm" variant="outline" class="border-blue-500 text-blue-600 hover:bg-blue-100 dark:border-blue-400 dark:text-blue-300">
-                Sign Up
-              </Button>
+            <Button size="sm" variant="outline"
+              class="border-blue-500 text-blue-600 hover:bg-blue-100 dark:border-blue-400 dark:text-blue-300">
+              Sign Up
+            </Button>
             </Link>
           </div>
         </div>
@@ -121,52 +163,50 @@ onUnmounted(() => {
 
       <div class="flex justify-between items-center mb-4">
         <h1 class="text-2xl font-bold">Starterkits Gallery</h1>
-        <Link :href="isLoggedIn ? route('starterkit.create') : route('login', { redirect: route('starterkit.create') })">
-          <Button>Add Starterkit</Button>
+        <Link
+          :href="isLoggedIn ? route('starterkit.create') : route('login', { redirect: route('starterkit.create') })">
+        <Button>Add Starterkit</Button>
         </Link>
+      </div>
+
+      <div class="mb-6">
+        <h2 class="text-lg font-medium mb-2">Filter by tags</h2>
+        <div class="flex flex-wrap gap-2">
+          <button v-for="tag in tags" :key="tag.id" @click="
+            selectedTags.includes(tag.id)
+              ? selectedTags = selectedTags.filter(t => t !== tag.id)
+              : selectedTags.push(tag.id);
+          filterStarterkits();
+          " :class="[
+            'rounded-full px-3 py-1 text-sm',
+            selectedTags.includes(tag.id)
+              ? 'bg-primary text-white'
+              : 'bg-primary/10 hover:bg-primary/20'
+          ]">
+            {{ tag.name }}
+          </button>
+        </div>
+      </div>
+
+      <div v-if="isLoading" class="mt-4 text-center">
+        <div
+          class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent"
+          role="status">
+          <span class="sr-only">Loading...</span>
+        </div>
       </div>
 
       <!-- Empty state -->
       <div v-if="loadedStarterkits.length === 0" class="p-8 text-center">
         <p class="text-gray-500 mb-4">No starterkits have been added yet.</p>
         <Link :href="route('starterkit.create')">
-          <Button>Be the first to add one!</Button>
+        <Button>Be the first to add one!</Button>
         </Link>
       </div>
 
       <!-- List view instead of grid -->
       <div v-else class="space-y-4">
-        <Card v-for="kit in loadedStarterkits" :key="kit.id" class="w-full">
-          <div class="flex flex-col md:flex-row md:items-center p-4">
-            <div class="flex-1">
-              <h3 class="font-medium text-lg">
-                <a :href="kit.url" target="_blank" class="hover:underline text-blue-600 dark:text-blue-400">
-                  {{ kit.url.replace('https://github.com/', '') }}
-                </a>
-              </h3>
-              <p class="text-sm text-gray-500 mt-1">
-                Added on {{ formatDate(kit.created_at) }}
-              </p>
-            </div>
-            <div class="mt-4 md:mt-0">
-              <Button variant="outline" as="a" :href="kit.url" target="_blank" class="w-full md:w-auto">
-                View Repository
-              </Button>
-            </div>
-          </div>
-        </Card>
-
-        <!-- Loading indicator -->
-        <div v-if="isLoading" class="py-4 text-center">
-          <div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent" role="status">
-            <span class="sr-only">Loading...</span>
-          </div>
-        </div>
-
-        <!-- End of list message -->
-        <div v-if="!hasMorePages && loadedStarterkits.length > 0" class="py-4 text-center text-gray-500">
-          You've reached the end of the list.
-        </div>
+        <StarterkitCard v-for="kit in loadedStarterkits" :key="kit.id" :starterkit="kit" :show-bookmark="isLoggedIn" />
       </div>
     </div>
   </AppLayout>

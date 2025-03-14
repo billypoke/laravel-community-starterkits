@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\StarterkitController;
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -30,5 +31,29 @@ Route::get('app/starterkits', [StarterkitController::class, 'index'])
 Route::get('/starterkits/load-more', [StarterkitController::class, 'loadMore']);
 Route::get('/api/starterkits/load-more', [StarterkitController::class, 'loadMore']);
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+Route::post('/app/starterkit/{starterkit}/bookmark', [App\Http\Controllers\StarterkitBookmarkController::class, '__invoke'])
+    ->middleware(['auth', 'verified'])
+    ->name('starterkit.bookmark');
+
+Route::get('/app/bookmarks', [StarterkitController::class, 'bookmarks'])
+    ->middleware(['auth', 'verified'])
+    ->name('starterkit.bookmarks');
+
+// Admin-only routes
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('app/tags', [TagController::class, 'index'])
+        ->middleware('admin')
+        ->name('tags.index');
+    Route::post('app/tags', [TagController::class, 'store'])
+        ->middleware('admin')
+        ->name('tags.store');
+    Route::put('app/tags/{tag}', [TagController::class, 'update'])
+        ->middleware('admin')
+        ->name('tags.update');
+    Route::delete('app/tags/{tag}', [TagController::class, 'destroy'])
+        ->middleware('admin')
+        ->name('tags.destroy');
+});
+
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

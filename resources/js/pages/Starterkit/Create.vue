@@ -7,9 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useGithubValidation } from '@/composables/useGithubValidation';
+import TagSelector from '@/components/TagSelector.vue';
 
 const form = useForm({
   url: '',
+  tags: [] as number[],
 });
 
 const { isValidating, validationError, validateGithubUrl } = useGithubValidation();
@@ -19,6 +21,10 @@ const handleSubmit = async () => {
     form.post(route('starterkit.store'));
   }
 };
+
+const props = defineProps<{
+  availableTags: Array<{ id: number; name: string }>;
+}>();
 
 const breadcrumbs: BreadcrumbItem[] = [
   {
@@ -33,6 +39,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 </script>
 
 <template>
+
   <Head title="Create Starterkit" />
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -52,6 +59,15 @@ const breadcrumbs: BreadcrumbItem[] = [
                 {{ validationError }}
               </div>
             </div>
+
+            <div class="space-y-2">
+              <Label>Tags</Label>
+              <TagSelector v-model="form.tags" :available-tags="availableTags" />
+              <div v-if="form.errors.tags" class="text-red-500 text-sm mt-1">
+                {{ form.errors.tags }}
+              </div>
+            </div>
+
             <div>
               <Button type="submit" :disabled="form.processing || isValidating">
                 <span v-if="isValidating">Validating...</span>
