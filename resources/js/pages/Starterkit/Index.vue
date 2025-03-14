@@ -164,7 +164,7 @@ const filterStarterkits = async () => {
       <div class="flex justify-between items-center mb-4">
         <h1 class="text-2xl font-bold">Starterkits Gallery</h1>
         <Link
-          :href="isLoggedIn ? route('starterkit.create') : route('login', { redirect: route('starterkit.create') })">
+          :href="isLoggedIn ? route('starterkit.create') : route('register', { redirect: route('starterkit.create') })">
         <Button>Add Starterkit</Button>
         </Link>
       </div>

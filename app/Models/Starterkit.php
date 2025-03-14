@@ -13,6 +13,10 @@ class Starterkit extends Model
     public $incrementing = false;
     protected $appends = ['is_bookmarked'];
 
+    protected $casts = [
+        'bookmark_count' => 'integer'
+    ];
+
     protected static function boot()
     {
         parent::boot();
