@@ -14,8 +14,8 @@ This platform aims to solve that by providing a central place to:
 ## Roadmap (not necessarily in order)
 
 - [x] Basic starterkit gallery
-- [ ] Add filterable tags (e.g. vue, svelte, stripe...)
-- [ ] Bookmark favourites
+- [x] Add filterable tags (e.g. vue, svelte, stripe...)
+- [x] Bookmark favourites
 - [ ] User upvotes/downvotes
 - [ ] GitHub stats integration (stars, last commit, etc)
 - [ ] Transfer ownership from one user to another
