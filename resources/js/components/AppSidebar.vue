@@ -12,12 +12,13 @@ const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: '/app/dashboard',
-        icon: LayoutGrid,
+        icon: Home,
+
     },
     {
         title: 'All Starterkits',
         href: '/app/starterkits',
-        icon: Home,
+        icon: LayoutGrid,
     },
     {
         title: 'Add Starterkit',
