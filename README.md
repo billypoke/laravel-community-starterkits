@@ -17,5 +17,4 @@ This platform aims to solve that by providing a central place to:
 - [x] Add filterable tags (e.g. vue, svelte, stripe...)
 - [x] Bookmark favourites
 - [x] Sort by number of bookmarks
-- [ ] GitHub stats integration (last commit, etc)
 - [ ] Transfer ownership from one user to another
