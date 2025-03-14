@@ -7,7 +7,10 @@ import axios from 'axios';
 const props = defineProps<{
   starterkitId: string;
   isBookmarked: boolean;
+  bookmarkCount: number;
 }>();
+
+const emit = defineEmits(['update:bookmarkCount', 'update:isBookmarked']);
 
 const isBookmarked = ref(props.isBookmarked);
 const isLoading = ref(false);
@@ -15,8 +18,16 @@ const isLoading = ref(false);
 const toggleBookmark = async () => {
   try {
     isLoading.value = true;
-    await axios.post(route('starterkit.bookmark', props.starterkitId));
+    const newCount = props.bookmarkCount + (isBookmarked.value ? -1 : 1);
     isBookmarked.value = !isBookmarked.value;
+    emit('update:bookmarkCount', newCount);
+    emit('update:isBookmarked', isBookmarked.value);
+
+    const response = await axios.post(route('starterkit.bookmark', props.starterkitId));
+    if (response.data.is_bookmarked !== isBookmarked.value) {
+      isBookmarked.value = response.data.is_bookmarked;
+      emit('update:isBookmarked', response.data.is_bookmarked);
+    }
   } catch (error) {
     console.error('Error toggling bookmark:', error);
   } finally {
@@ -26,13 +37,8 @@ const toggleBookmark = async () => {
 </script>
 
 <template>
-  <Button
-    variant="ghost"
-    size="icon"
-    :disabled="isLoading"
-    @click="toggleBookmark"
-    :class="[isBookmarked ? 'text-yellow-500' : 'text-gray-500']"
-  >
+  <Button variant="ghost" size="icon" :disabled="isLoading" @click="toggleBookmark"
+    :class="[isBookmarked ? 'text-yellow-500' : 'text-gray-500']">
     <Bookmark :class="{ 'fill-current': isBookmarked }" class="h-5 w-5" />
   </Button>
 </template>

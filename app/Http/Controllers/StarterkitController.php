@@ -48,7 +48,11 @@ class StarterkitController extends Controller
             }
         }
 
-        $allStarterkits = $query->latest()->paginate($perPage);
+        $allStarterkits = $query
+            ->orderBy('bookmark_count', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->paginate($perPage);
+
         $allTags = Tag::all(['id', 'name']);
 
         return Inertia::render('Starterkit/Index', [
@@ -81,7 +85,8 @@ class StarterkitController extends Controller
         }
 
         $moreStarterkits = $query
-            ->latest()
+            ->orderBy('bookmark_count', 'desc')
+            ->orderBy('created_at', 'desc')
             ->paginate($perPage, ['*'], 'page', $page);
 
         return response()->json($moreStarterkits);

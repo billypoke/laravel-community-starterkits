@@ -6,6 +6,7 @@ import { Link } from '@inertiajs/vue3';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 import BookmarkButton from './BookmarkButton.vue';
 import { router } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 const props = defineProps<{
   starterkit: {
@@ -21,10 +22,14 @@ const props = defineProps<{
     }>;
     created_at: string;
     is_bookmarked?: boolean;
+    bookmark_count: number;
   };
   showBookmark?: boolean;
   showActions?: boolean;
 }>();
+
+const bookmarkCount = ref(props.starterkit.bookmark_count);
+const isBookmarked = ref(props.starterkit.is_bookmarked ?? false);
 
 const formatDate = (date: string) => {
   return new Date(date).toLocaleDateString('en-US', {
@@ -65,8 +70,11 @@ const deleteStarterkit = () => {
         </p>
       </div>
       <div class="mt-4 md:mt-0 flex items-center gap-2">
-        <BookmarkButton v-if="showBookmark" :starterkit-id="starterkit.id"
-          :is-bookmarked="starterkit.is_bookmarked ?? false" />
+        <div v-if="showBookmark" class="flex flex-col items-center">
+          <BookmarkButton :starterkit-id="starterkit.id" :is-bookmarked="isBookmarked"
+            v-model:bookmark-count="bookmarkCount" v-model:is-bookmarked="isBookmarked" />
+          <span class="text-xs text-gray-500">{{ bookmarkCount }}</span>
+        </div>
 
         <template v-if="showActions">
           <Link :href="route('starterkit.edit', starterkit.id)">

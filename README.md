@@ -16,6 +16,6 @@ This platform aims to solve that by providing a central place to:
 - [x] Basic starterkit gallery
 - [x] Add filterable tags (e.g. vue, svelte, stripe...)
 - [x] Bookmark favourites
-- [ ] User upvotes/downvotes
+- [x] Sort by number of bookmarks
 - [ ] GitHub stats integration (stars, last commit, etc)
 - [ ] Transfer ownership from one user to another
