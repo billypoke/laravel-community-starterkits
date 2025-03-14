@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import BookmarkButton from '@/components/BookmarkButton.vue';
+import { Button } from '@/components/ui/button';
+import { Link } from '@inertiajs/vue3';
+import { Pencil, Trash2 } from 'lucide-vue-next';
+import BookmarkButton from './BookmarkButton.vue';
+import { router } from '@inertiajs/vue3';
 
 const props = defineProps<{
   starterkit: {
     id: string;
     url: string;
-    user?: {
+    user: {
       id: number;
       name: string;
     };
@@ -20,6 +23,7 @@ const props = defineProps<{
     is_bookmarked?: boolean;
   };
   showBookmark?: boolean;
+  showActions?: boolean;
 }>();
 
 const formatDate = (date: string) => {
@@ -28,6 +32,12 @@ const formatDate = (date: string) => {
     month: 'long',
     day: 'numeric',
   });
+};
+
+const deleteStarterkit = () => {
+  if (confirm('Are you sure you want to delete this starterkit?')) {
+    router.delete(route('starterkit.destroy', props.starterkit.id));
+  }
 };
 </script>
 
@@ -55,14 +65,19 @@ const formatDate = (date: string) => {
         </p>
       </div>
       <div class="mt-4 md:mt-0 flex items-center gap-2">
-        <BookmarkButton 
-          v-if="showBookmark" 
-          :starterkit-id="starterkit.id" 
-          :is-bookmarked="starterkit.is_bookmarked" 
-        />
-        <Button variant="outline" as="a" :href="starterkit.url" target="_blank" class="w-full md:w-auto">
-          View Repository
-        </Button>
+        <BookmarkButton v-if="showBookmark" :starterkit-id="starterkit.id"
+          :is-bookmarked="starterkit.is_bookmarked ?? false" />
+
+        <template v-if="showActions">
+          <Link :href="route('starterkit.edit', starterkit.id)">
+          <Button variant="outline" size="sm">
+            <Pencil class="h-4 w-4" />
+          </Button>
+          </Link>
+          <Button @click="deleteStarterkit" variant="destructive" size="sm">
+            <Trash2 class="h-4 w-4" />
+          </Button>
+        </template>
       </div>
     </div>
   </Card>

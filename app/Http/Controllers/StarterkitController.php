@@ -17,8 +17,16 @@ class StarterkitController extends Controller
             ->with('tags')
             ->latest()
             ->get();
+
+        $bookmarks = Auth::user()
+            ->bookmarks()
+            ->with(['tags', 'user'])
+            ->latest()
+            ->get();
+
         return Inertia::render('Dashboard', [
-            'starterkits' => $userStarterkits
+            'starterkits' => $userStarterkits,
+            'bookmarks' => $bookmarks
         ]);
     }
     /**

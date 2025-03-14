@@ -21,11 +21,6 @@ const mainNavItems = computed(() => {
       icon: LayoutGrid,
     },
     {
-      title: 'Bookmarked',
-      href: '/app/bookmarks',
-      icon: Bookmark,
-    },
-    {
       title: 'Add Starterkit',
       href: '/app/starterkit/create',
       icon: Plus,
