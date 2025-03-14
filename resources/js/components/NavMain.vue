@@ -3,7 +3,7 @@ import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, Sideba
 import { type NavItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed } from 'vue';
-import { LayoutGrid, Plus, Home, Tag } from 'lucide-vue-next';
+import { LayoutGrid, Plus, Home, Tag, Bookmark } from 'lucide-vue-next';
 
 const page = usePage<SharedData>();
 const isAdmin = computed(() => page.props.auth.user?.id === 1);
@@ -19,6 +19,11 @@ const mainNavItems = computed(() => {
       title: 'All Starterkits',
       href: '/app/starterkits',
       icon: LayoutGrid,
+    },
+    {
+      title: 'Bookmarked',
+      href: '/app/bookmarks',
+      icon: Bookmark,
     },
     {
       title: 'Add Starterkit',

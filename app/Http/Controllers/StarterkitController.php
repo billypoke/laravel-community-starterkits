@@ -178,4 +178,17 @@ class StarterkitController extends Controller
         return redirect()->route('dashboard')
             ->with('message', 'Starterkit deleted successfully!');
     }
+    public function bookmarks()
+    {
+        $bookmarkedStarterkits = Starterkit::whereHas('bookmarks', function ($query) {
+            $query->where('user_id', Auth::id());
+        })
+            ->with(['user:id,name', 'tags'])
+            ->latest()
+            ->get();
+
+        return Inertia::render('Starterkit/Bookmarks', [
+            'starterkits' => $bookmarkedStarterkits
+        ]);
+    }
 }

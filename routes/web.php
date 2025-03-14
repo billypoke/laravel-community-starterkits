@@ -31,6 +31,14 @@ Route::get('app/starterkits', [StarterkitController::class, 'index'])
 Route::get('/starterkits/load-more', [StarterkitController::class, 'loadMore']);
 Route::get('/api/starterkits/load-more', [StarterkitController::class, 'loadMore']);
 
+Route::post('/app/starterkit/{starterkit}/bookmark', [App\Http\Controllers\StarterkitBookmarkController::class, '__invoke'])
+    ->middleware(['auth', 'verified'])
+    ->name('starterkit.bookmark');
+
+Route::get('/app/bookmarks', [StarterkitController::class, 'bookmarks'])
+    ->middleware(['auth', 'verified'])
+    ->name('starterkit.bookmarks');
+
 // Admin-only routes
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('app/tags', [TagController::class, 'index'])
