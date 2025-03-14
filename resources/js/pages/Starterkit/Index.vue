@@ -171,20 +171,22 @@ const filterStarterkits = async () => {
 
       <div class="mb-6">
         <h2 class="text-lg font-medium mb-2">Filter by tags</h2>
-        <div class="flex flex-wrap gap-2">
-          <button v-for="tag in tags" :key="tag.id" @click="
-            selectedTags.includes(tag.id)
-              ? selectedTags = selectedTags.filter(t => t !== tag.id)
-              : selectedTags.push(tag.id);
-          filterStarterkits();
-          " :class="[
-            'rounded-full px-3 py-1 text-sm',
-            selectedTags.includes(tag.id)
-              ? 'bg-primary text-white'
-              : 'bg-primary/10 hover:bg-primary/20'
-          ]">
-            {{ tag.name }}
-          </button>
+        <div class="flex flex-wrap gap-2 mb-4">
+          <template v-if="tags && tags.length">
+            <button v-for="tag in tags" :key="tag.id" @click="
+              selectedTags.includes(tag.id)
+                ? selectedTags = selectedTags.filter(t => t !== tag.id)
+                : selectedTags.push(tag.id);
+            filterStarterkits();
+            " :class="[
+                'rounded-full px-3 py-1 text-sm transition-colors',
+                selectedTags.includes(tag.id)
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              ]">
+              {{ tag.name }}
+            </button>
+          </template>
         </div>
       </div>
 
