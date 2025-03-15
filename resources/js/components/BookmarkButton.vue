@@ -3,7 +3,9 @@ import { Button } from '@/components/ui/button';
 import { Bookmark } from 'lucide-vue-next';
 import { ref } from 'vue';
 import axios from 'axios';
-import { router } from '@inertiajs/vue3';
+import { router, usePage } from '@inertiajs/vue3';
+
+const page = usePage();
 
 const props = defineProps<{
   starterkitId: string;
@@ -12,13 +14,11 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(['update:bookmarkCount', 'update:isBookmarked']);
-
 const isBookmarked = ref(props.isBookmarked);
 const isLoading = ref(false);
 
 const toggleBookmark = async () => {
-  // Check if user is authenticated by checking if the auth.user exists in $page.props
-  if (!window.document.querySelector('html').hasAttribute('data-auth')) {
+  if (!page.props.auth.user.email) {
     // Redirect to register page with the current URL as redirect parameter
     router.visit(route('register'), {
       data: {
@@ -38,6 +38,7 @@ const toggleBookmark = async () => {
 
     // Still make the server request but don't use its count
     const response = await axios.post(route('starterkit.bookmark', props.starterkitId));
+
     // Only use server response for bookmark state validation
     if (response.data.is_bookmarked !== isBookmarked.value) {
       isBookmarked.value = response.data.is_bookmarked;
@@ -52,8 +53,13 @@ const toggleBookmark = async () => {
 </script>
 
 <template>
-  <Button variant="ghost" size="icon" :disabled="isLoading" @click="toggleBookmark"
-    :class="[isBookmarked ? 'text-yellow-500' : 'text-gray-500']">
+  <Button
+    variant="ghost"
+    size="icon"
+    :disabled="isLoading"
+    @click="toggleBookmark"
+    :class="[isBookmarked ? 'text-yellow-500' : 'text-gray-500']"
+  >
     <Bookmark :class="{ 'fill-current': isBookmarked }" class="h-5 w-5" />
   </Button>
 </template>

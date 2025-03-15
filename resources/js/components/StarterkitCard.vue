@@ -61,12 +61,7 @@ const deleteStarterkit = () => {
           </Badge>
         </div>
         <p class="text-sm text-gray-500 mt-2">
-          <template v-if="starterkit.user">
-            Added by {{ starterkit.user.name }} on {{ formatDate(starterkit.created_at) }}
-          </template>
-          <template v-else>
-            Added on {{ formatDate(starterkit.created_at) }}
-          </template>
+          Added on {{ formatDate(starterkit.created_at) }}
         </p>
       </div>
       <div class="mt-4 md:mt-0 flex items-center gap-2">
