@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
     /**
@@ -49,5 +50,10 @@ class User extends Authenticatable
     public function bookmarks(): BelongsToMany
     {
         return $this->belongsToMany(Starterkit::class, 'starterkit_bookmarks');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->id === 1;
     }
 }

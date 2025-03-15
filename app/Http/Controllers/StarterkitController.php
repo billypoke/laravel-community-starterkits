@@ -1,17 +1,27 @@
 <?php
+
 namespace App\Http\Controllers;
+
 use App\Models\Starterkit;
 use App\Models\Tag;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Inertia\Response;
+
 class StarterkitController extends Controller
 {
+    private const PER_PAGE = 10;
+
     /**
      * GitHub URL validation pattern
      */
-    private $githubUrlPattern = '/^https?:\/\/(www\.)?github\.com\/.*$/i';
-    public function dashboard()
+    private string $githubUrlPattern = '/^https?:\/\/(www\.)?github\.com\/.*$/i';
+
+    public function dashboard(): Response
     {
         $userStarterkits = Starterkit::where('user_id', Auth::id())
             ->with('tags')
@@ -20,38 +30,25 @@ class StarterkitController extends Controller
 
         $bookmarks = Auth::user()
             ->bookmarks()
-            ->with(['tags', 'user'])
+            ->with('tags')
             ->latest()
             ->get();
 
         return Inertia::render('Dashboard', [
             'starterkits' => $userStarterkits,
-            'bookmarks' => $bookmarks
+            'bookmarks' => $bookmarks,
         ]);
     }
+
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(): Response
     {
-        $perPage = 10;
-        $query = Starterkit::with(['user:id,name', 'tags']);
-
-        if ($request->has('tags')) {
-            $tags = array_filter($request->tags);
-            if (!empty($tags)) {
-                foreach ($tags as $tagId) {
-                    $query->whereHas('tags', function ($q) use ($tagId) {
-                        $q->where('tags.id', $tagId);
-                    });
-                }
-            }
-        }
-
-        $allStarterkits = $query
+        $allStarterkits = $this->queryStarterkits()
             ->orderBy('bookmark_count', 'desc')
             ->orderBy('created_at', 'desc')
-            ->paginate($perPage);
+            ->paginate(self::PER_PAGE);
 
         $allTags = Tag::all(['id', 'name']);
 
@@ -59,58 +56,45 @@ class StarterkitController extends Controller
             'starterkits' => $allStarterkits,
             'tags' => $allTags,
             'auth' => [
-                'user' => Auth::user() ?? (object) ['name' => 'Guest']
-            ]
+                'user' => Auth::user() ?? (object) ['name' => 'Guest'],
+            ],
         ]);
     }
+
     /**
      * Load more starterkits for infinite scrolling
      */
-    public function loadMore(Request $request)
+    public function loadMore(Request $request): JsonResponse
     {
-        $page = $request->input('page', 1);
-        $perPage = 10;
-
-        $query = Starterkit::with(['user:id,name', 'tags']);
-
-        if ($request->has('tags')) {
-            $tags = array_filter($request->tags);
-            if (!empty($tags)) {
-                foreach ($tags as $tagId) {
-                    $query->whereHas('tags', function ($q) use ($tagId) {
-                        $q->where('tags.id', $tagId);
-                    });
-                }
-            }
-        }
-
-        $moreStarterkits = $query
+        $moreStarterkits = $this->queryStarterkits()
             ->orderBy('bookmark_count', 'desc')
             ->orderBy('created_at', 'desc')
-            ->paginate($perPage, ['*'], 'page', $page);
+            ->paginate(perPage: self::PER_PAGE, page: $request->input('page', 1));
 
         return response()->json($moreStarterkits);
     }
+
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(): Response
     {
         return Inertia::render('Starterkit/Create', [
             'availableTags' => Tag::all(['id', 'name']),
         ]);
     }
+
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'url' => [
                 'required',
                 'url',
                 'unique:starterkits,url',
-                'regex:' . $this->githubUrlPattern,
+                'regex:'.$this->githubUrlPattern,
             ],
             'tags' => ['array'],
             'tags.*' => ['exists:tags,id'],
@@ -130,43 +114,40 @@ class StarterkitController extends Controller
         return redirect()->route('dashboard')
             ->with('message', 'Starterkit created successfully!');
     }
-    /**
-     * Display the specified resource.
-     */
-    public function show(Starterkit $starterkit)
-    {
-        //
-    }
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Starterkit $starterkit)
+
+    public function edit(Request $request, Starterkit $starterkit): Response
     {
         // Check if user owns this starterkit
-        if ($starterkit->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        abort_unless(
+            $request->user()->can('update', $starterkit),
+            403,
+            'Unauthorized action.',
+        );
 
         return Inertia::render('Starterkit/Edit', [
             'starterkit' => $starterkit->load('tags'),
             'availableTags' => Tag::all(['id', 'name']),
         ]);
     }
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Starterkit $starterkit)
+    public function update(Request $request, Starterkit $starterkit): RedirectResponse
     {
-        if ($starterkit->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        // Check if user owns this starterkit
+        abort_unless(
+            $request->user()->can('update', $starterkit),
+            403,
+            'Unauthorized action.',
+        );
 
         $validated = $request->validate([
             'url' => [
                 'required',
                 'url',
-                'unique:starterkits,url,' . $starterkit->id,
-                'regex:' . $this->githubUrlPattern,
+                'unique:starterkits,url,'.$starterkit->id,
+                'regex:'.$this->githubUrlPattern,
             ],
             'tags' => ['array'],
             'tags.*' => ['exists:tags,id'],
@@ -178,30 +159,34 @@ class StarterkitController extends Controller
         return redirect()->route('dashboard')
             ->with('message', 'Starterkit updated successfully!');
     }
+
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Starterkit $starterkit)
+    public function destroy(Request $request, Starterkit $starterkit): RedirectResponse
     {
         // Check if user owns this starterkit
-        if ($starterkit->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
+        abort_unless(
+            $request->user()->can('delete', $starterkit),
+            403,
+            'Unauthorized action.',
+        );
+
         $starterkit->delete();
+
         return redirect()->route('dashboard')
             ->with('message', 'Starterkit deleted successfully!');
     }
-    public function bookmarks()
-    {
-        $bookmarkedStarterkits = Starterkit::whereHas('bookmarks', function ($query) {
-            $query->where('user_id', Auth::id());
-        })
-            ->with(['user:id,name', 'tags'])
-            ->latest()
-            ->get();
 
-        return Inertia::render('Starterkit/Bookmarks', [
-            'starterkits' => $bookmarkedStarterkits
-        ]);
+    private function queryStarterkits(): Builder
+    {
+        return Starterkit::with('tags')
+            ->when(
+                array_filter(request()->array('tags')) !== [],
+                fn (Builder $kits) => $kits->whereHas(
+                    'tags',
+                    fn (Builder $tags) => $tags->whereIn('id', request()->array('tags'))
+                )
+            );
     }
 }

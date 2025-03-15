@@ -1,9 +1,12 @@
 <?php
+
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class Starterkit extends Model
@@ -42,11 +45,10 @@ class Starterkit extends Model
         return $this->belongsToMany(User::class, 'starterkit_bookmarks');
     }
 
-    public function getIsBookmarkedAttribute(): bool
+    public function isBookmarked(): Attribute
     {
-        if (!auth()->check()) {
-            return false;
-        }
-        return $this->bookmarks()->where('user_id', auth()->id())->exists();
+        return Attribute::get(
+            fn (): bool => Auth::check() && $this->whereRelation('bookmarks', 'user_id', Auth::id())->exists()
+        );
     }
 }
