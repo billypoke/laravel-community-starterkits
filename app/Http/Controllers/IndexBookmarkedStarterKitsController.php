@@ -11,7 +11,7 @@ class IndexBookmarkedStarterKitsController extends Controller
     public function __invoke()
     {
         $bookmarkedStarterkits = Starterkit::query()
-            ->whereRelation('bookmarks.user_id', Auth::id())
+            ->whereRelation('bookmarks', 'user_id', Auth::id())
             ->with('tags')
             ->latest()
             ->get();
