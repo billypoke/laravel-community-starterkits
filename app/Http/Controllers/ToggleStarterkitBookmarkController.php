@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\Starterkit;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class StarterkitBookmarkController extends Controller
+class ToggleStarterkitBookmarkController extends Controller
 {
-    public function __invoke(Request $request, Starterkit $starterkit)
+    public function __invoke(Request $request, Starterkit $starterkit): JsonResponse|RedirectResponse
     {
         $user = Auth::user();
         $message = '';
@@ -32,7 +34,7 @@ class StarterkitBookmarkController extends Controller
             return response()->json([
                 'message' => $message,
                 'bookmark_count' => $starterkit->bookmark_count,
-                'is_bookmarked' => $starterkit->is_bookmarked
+                'is_bookmarked' => $starterkit->is_bookmarked,
             ]);
         }
 
