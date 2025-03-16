@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Link } from '@inertiajs/vue3';
+import { Card } from '@/components/ui/card';
+import { Link, router } from '@inertiajs/vue3';
 import { Pencil, Trash2 } from 'lucide-vue-next';
-import BookmarkButton from './BookmarkButton.vue';
-import { router } from '@inertiajs/vue3';
 import { ref } from 'vue';
+import BookmarkButton from './BookmarkButton.vue';
 
 const props = defineProps<{
   starterkit: {
@@ -48,34 +47,36 @@ const deleteStarterkit = () => {
 
 <template>
   <Card class="w-full">
-    <div class="flex flex-col md:flex-row md:items-center p-4">
+    <div class="flex flex-col p-4 md:flex-row md:items-center">
       <div class="flex-1">
-        <h3 class="font-medium text-lg">
-          <a :href="starterkit.url" target="_blank" class="hover:underline text-blue-600 dark:text-blue-400">
+        <h3 class="text-lg font-medium">
+          <a :href="starterkit.url" target="_blank" class="text-blue-600 hover:underline dark:text-blue-400">
             {{ starterkit.url.replace('https://github.com/', '') }}
           </a>
         </h3>
-        <div class="flex flex-wrap gap-2 mt-2">
+        <div class="mt-2 flex flex-wrap gap-2">
           <Badge v-for="tag in starterkit.tags" :key="tag.id" variant="secondary" class="text-xs">
             {{ tag.name }}
           </Badge>
         </div>
-        <p class="text-sm text-gray-500 mt-2">
-          Added on {{ formatDate(starterkit.created_at) }}
-        </p>
+        <p class="mt-2 text-sm text-gray-500">Added on {{ formatDate(starterkit.created_at) }}</p>
       </div>
-      <div class="mt-4 md:mt-0 flex items-center gap-2">
+      <div class="mt-4 flex items-center gap-2 md:mt-0">
         <div v-if="showBookmark" class="flex flex-col items-center">
-          <BookmarkButton :starterkit-id="starterkit.id" :is-bookmarked="isBookmarked"
-            v-model:bookmark-count="bookmarkCount" v-model:is-bookmarked="isBookmarked" />
+          <BookmarkButton
+            :starterkit-id="starterkit.id"
+            :is-bookmarked="isBookmarked"
+            :bookmark-count="bookmarkCount"
+            @update:bookmark-count="(newCount) => (bookmarkCount = newCount)"
+          />
           <span class="text-xs text-gray-500">{{ bookmarkCount }}</span>
         </div>
 
         <template v-if="showActions">
           <Link :href="route('starterkit.edit', starterkit.id)">
-          <Button variant="outline" size="sm">
-            <Pencil class="h-4 w-4" />
-          </Button>
+            <Button variant="outline" size="sm">
+              <Pencil class="h-4 w-4" />
+            </Button>
           </Link>
           <Button @click="deleteStarterkit" variant="destructive" size="sm">
             <Trash2 class="h-4 w-4" />
