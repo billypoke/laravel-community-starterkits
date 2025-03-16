@@ -12,14 +12,14 @@ createServer((page) =>
         page,
         render: renderToString,
         title: (title) => `${title} - ${appName}`,
-        resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob('./pages/**/*.vue')),
+        resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob('./Pages/**/*.vue')),
         setup({ App, props, plugin }) {
             const app = createSSRApp({ render: () => h(App, props) });
 
             // Configure Ziggy for SSR...
             const ziggyConfig = {
                 ...page.props.ziggy,
-                location: new URL(page.props.ziggy.location),
+                location: new URL(page.props.ziggy.location)
             };
 
             // Create route function...
@@ -36,6 +36,6 @@ createServer((page) =>
             app.use(plugin);
 
             return app;
-        },
-    }),
+        }
+    })
 );

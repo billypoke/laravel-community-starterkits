@@ -11,6 +11,7 @@ import { initializeTheme } from './composables/useAppearance';
 declare module 'vite/client' {
     interface ImportMetaEnv {
         readonly VITE_APP_NAME: string;
+
         [key: string]: string | boolean | undefined;
     }
 
@@ -24,7 +25,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
+    resolve: (name) => resolvePageComponent(`./Pages/${name}.vue`, import.meta.glob<DefineComponent>('./Pages/**/*.vue')),
     setup({ el, App, props, plugin }) {
         createApp({ render: () => h(App, props) })
             .use(plugin)
@@ -32,8 +33,8 @@ createInertiaApp({
             .mount(el);
     },
     progress: {
-        color: '#4B5563',
-    },
+        color: '#4B5563'
+    }
 });
 
 // This will set light / dark mode on page load...
