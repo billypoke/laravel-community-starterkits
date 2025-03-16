@@ -30,16 +30,17 @@ test('it can show more when requested', function () {
         );
 });
 
-test('an authenticated user can view the starterkit creation form', function () {
-    $this->actingAs(User::factory()->create());
+test('an authenticated user can view the starterkit creation form',
+    function () {
+        $this->actingAs(User::factory()->create());
 
-    $this->get(route('starterkit.create'))
-        ->assertOk()
-        ->assertInertia(
-            fn (AssertableInertia $page) => $page
-                ->component('Starterkit/Create')
-        );
-});
+        $this->get(route('starterkit.create'))
+            ->assertOk()
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->component('Starterkit/Create')
+            );
+    });
 
 test('an authenticated user can create new starterkits', function () {
     $this->actingAs(User::factory()->create());
@@ -53,20 +54,20 @@ test('an authenticated user can create new starterkits', function () {
     ]);
 });
 
-test('an authenticated user can view the edit form for one of their kits', function () {
-    $starterkit = Starterkit::factory()->create();
+test('an authenticated user can view the edit form for one of their kits',
+    function () {
+        $starterkit = Starterkit::factory()->create();
 
-    $this->actingAs($starterkit->user);
+        $this->actingAs($starterkit->user);
 
-    $this->get(route('starterkit.edit', $starterkit))
-        ->assertOk()
-        ->assertInertia(
-            fn (AssertableInertia $page) => $page
-                ->component('Starterkit/Edit')
-                ->where('starterkit.id', (string) $starterkit->getKey())
-                ->etc()
-        );
-});
+        $this->get(route('starterkit.edit', $starterkit))
+            ->assertOk()
+            ->assertInertia(
+                fn (AssertableInertia $page) => $page
+                    ->component('Starterkit/Edit')
+                    ->where('starterkit.id', (string) $starterkit->getKey())
+            );
+    });
 
 test('an authenticated user can update their starterkit', function () {
     $starterkit = Starterkit::factory()->create();
@@ -128,31 +129,34 @@ test('a guest cannot delete a starterkit', function () {
         ->assertRedirect(route('login'));
 });
 
-test('an authenticated user cannot view the edit form for a kit they do not own', function () {
-    $starterkit = Starterkit::factory()->create();
+test('an authenticated user cannot view the edit form for a kit they do not own',
+    function () {
+        $starterkit = Starterkit::factory()->create();
 
-    $this->actingAs(User::factory()->create())
-        ->get(route('starterkit.edit', $starterkit))
-        ->assertForbidden();
-});
+        $this->actingAs(User::factory()->create())
+            ->get(route('starterkit.edit', $starterkit))
+            ->assertForbidden();
+    });
 
-test('an authenticated user cannot update a starterkit they do not own', function () {
-    $starterkit = Starterkit::factory()->create();
+test('an authenticated user cannot update a starterkit they do not own',
+    function () {
+        $starterkit = Starterkit::factory()->create();
 
-    $this->actingAs(User::factory()->create())
-        ->put(route('starterkit.update', $starterkit), [
-            'url' => 'https://github.com/laravel/laravel',
-        ])
-        ->assertForbidden();
-});
+        $this->actingAs(User::factory()->create())
+            ->put(route('starterkit.update', $starterkit), [
+                'url' => 'https://github.com/laravel/laravel',
+            ])
+            ->assertForbidden();
+    });
 
-test('an authenticated user cannot delete a starterkit they do not own', function () {
-    $starterkit = Starterkit::factory()->create();
+test('an authenticated user cannot delete a starterkit they do not own',
+    function () {
+        $starterkit = Starterkit::factory()->create();
 
-    $this->actingAs(User::factory()->create())
-        ->delete(route('starterkit.destroy', $starterkit))
-        ->assertForbidden();
-});
+        $this->actingAs(User::factory()->create())
+            ->delete(route('starterkit.destroy', $starterkit))
+            ->assertForbidden();
+    });
 
 test('an administrator can view the edit form for any kit', function () {
     $adminUser = User::factory([
@@ -172,7 +176,6 @@ test('an administrator can view the edit form for any kit', function () {
             fn (AssertableInertia $page) => $page
                 ->component('Starterkit/Edit')
                 ->where('starterkit.id', (string) $starterkit->getKey())
-                ->etc()
         );
 });
 
@@ -217,4 +220,23 @@ test('an administrator can delete any starterkit', function () {
     $this->assertDatabaseMissing('starterkits', [
         'id' => $starterkit->id,
     ]);
+});
+
+test('the users bookmarked starterkits are shown in the response', function () {
+    $user = User::factory()->create();
+    $starterkits = Starterkit::factory(10)->create();
+
+    // The controller returns sorted by latest, so we attach to the most recent for ease of testing
+    $user->bookmarks()->attach($starterkits->last());
+
+    $this->actingAs($user)
+        ->get(route('starterkit.index'))
+        ->assertOk()
+        ->assertInertia(
+            fn (AssertableInertia $page) => $page
+                ->component('Starterkit/Index')
+                ->has('starterkits.data', 10)
+                ->where('starterkits.data.0.is_bookmarked', true)
+                ->where('starterkits.data.1.is_bookmarked', false)
+        );
 });
