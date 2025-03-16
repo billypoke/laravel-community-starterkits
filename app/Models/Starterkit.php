@@ -53,7 +53,7 @@ class Starterkit extends Model
     public function isBookmarked(): Attribute
     {
         return Attribute::get(
-            fn (): bool => Auth::check() && $this->whereRelation('bookmarks', 'user_id', Auth::id())->exists()
+            fn (): bool => Auth::check() && $this->bookmarks()->where('user_id', auth()->id())->exists()
         );
     }
 }
