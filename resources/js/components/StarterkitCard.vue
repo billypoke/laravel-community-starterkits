@@ -2,27 +2,14 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Starterkit } from '@/types';
 import { Link, router } from '@inertiajs/vue3';
 import { Pencil, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 import BookmarkButton from './BookmarkButton.vue';
 
 const props = defineProps<{
-  starterkit: {
-    id: string;
-    url: string;
-    user: {
-      id: number;
-      name: string;
-    };
-    tags: Array<{
-      id: number;
-      name: string;
-    }>;
-    created_at: string;
-    is_bookmarked?: boolean;
-    bookmark_count: number;
-  };
+  starterkit: Starterkit;
   showBookmark?: boolean;
   showActions?: boolean;
 }>();

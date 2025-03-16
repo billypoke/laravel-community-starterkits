@@ -1,40 +1,14 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/vue3';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StarterkitCard from '@/components/StarterkitCard.vue';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem, Starterkit } from '@/types';
+import { Head, Link } from '@inertiajs/vue3';
 
-const props = defineProps<{
-  starterkits: Array<{
-    id: string;
-    url: string;
-    created_at: string;
-    user: {
-      id: number;
-      name: string;
-    };
-    tags: Array<{
-      id: number;
-      name: string;
-    }>;
-  }>;
-  bookmarks: Array<{
-    id: string;
-    url: string;
-    created_at: string;
-    user: {
-      id: number;
-      name: string;
-    };
-    tags: Array<{
-      id: number;
-      name: string;
-    }>;
-  }>;
+defineProps<{
+  starterkits: Array<Starterkit>;
+  bookmarks: Array<Starterkit>;
 }>();
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -46,14 +20,13 @@ const breadcrumbs: BreadcrumbItem[] = [
 </script>
 
 <template>
-
   <Head title="Dashboard" />
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-      <div class="flex justify-between items-center mb-4">
+      <div class="mb-4 flex items-center justify-between">
         <h1 class="text-2xl font-bold">Dashboard</h1>
         <Link :href="route('starterkit.create')">
-        <Button>Add Starter Kit</Button>
+          <Button>Add Starter Kit</Button>
         </Link>
       </div>
 
@@ -65,9 +38,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 
         <TabsContent value="bookmarks">
           <div v-if="!bookmarks?.length" class="p-8 text-center">
-            <p class="text-gray-500 mb-4">You haven't bookmarked any starterkits yet.</p>
+            <p class="mb-4 text-gray-500">You haven't bookmarked any starterkits yet.</p>
             <Link :href="route('starterkit.index')">
-            <Button>Browse Starter Kits</Button>
+              <Button>Browse Starter Kits</Button>
             </Link>
           </div>
           <div v-else class="space-y-4">
@@ -77,9 +50,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 
         <TabsContent value="my-kits">
           <div v-if="!starterkits?.length" class="p-8 text-center">
-            <p class="text-gray-500 mb-4">You haven't created any starter kits yet.</p>
+            <p class="mb-4 text-gray-500">You haven't created any starter kits yet.</p>
             <Link :href="route('starterkit.create')">
-            <Button>Create Your First Kit</Button>
+              <Button>Create Your First Kit</Button>
             </Link>
           </div>
           <div v-else class="space-y-4">
