@@ -10,9 +10,7 @@ class AdminOnly
 {
     public function handle(Request $request, Closure $next)
     {
-        if (Auth::id() !== 1) {
-            abort(403);
-        }
+        abort_unless(Auth::user()->is_admin, 403);
 
         return $next($request);
     }
