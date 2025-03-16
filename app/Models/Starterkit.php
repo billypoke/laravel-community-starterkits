@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\StarterkitFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -11,6 +13,9 @@ use Illuminate\Support\Str;
 
 class Starterkit extends Model
 {
+    /** @use HasFactory<StarterkitFactory> */
+    use HasFactory;
+
     protected $guarded = [];
     protected $keyType = 'string';
     public $incrementing = false;
