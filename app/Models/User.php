@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -35,6 +36,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'is_admin',
+    ];
+
     /**
      * Get the attributes that should be cast.
      *
@@ -53,8 +58,10 @@ class User extends Authenticatable
         return $this->belongsToMany(Starterkit::class, 'starterkit_bookmarks');
     }
 
-    public function isAdmin(): bool
+    public function isAdmin(): Attribute
     {
-        return $this->id === 1;
+        return Attribute::get(
+            fn () => $this->id === 1,
+        );
     }
 }
