@@ -69,7 +69,7 @@ const loadMoreStarterkits = async () => {
   isLoading.value = true;
   try {
     const nextPage = currentPage.value + 1;
-    const response = await axios.get('/api/starterkits/load-more', {
+    const response = await axios.get(route('starterkit.load-more'), {
       params: {
         page: nextPage,
         tags: selectedTags.value
@@ -116,7 +116,7 @@ const selectedTags = ref<number[]>([]);
 const filterStarterkits = async () => {
   isLoading.value = true;
   try {
-    const response = await axios.get('/api/starterkits/load-more', {
+    const response = await axios.get(route('starterkit.load-more'), {
       params: {
         page: 1,
         tags: selectedTags.value
