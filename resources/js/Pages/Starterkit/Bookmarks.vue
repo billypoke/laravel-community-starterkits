@@ -1,13 +1,11 @@
 <script setup lang="ts">
+import StarterkitCard from '@/components/StarterkitCard.vue';
+import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/vue3';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import StarterkitCard from '@/components/StarterkitCard.vue';
 
-const props = defineProps<{
+defineProps<{
   starterkits: Array<{
     id: string;
     url: string;
@@ -29,29 +27,20 @@ const breadcrumbs: BreadcrumbItem[] = [
     href: route('starterkit.bookmarks'),
   },
 ];
-
-const formatDate = (date: string) => {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-};
 </script>
 
 <template>
-
   <Head title="Bookmarks" />
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
-      <div class="flex justify-between items-center mb-4">
+      <div class="mb-4 flex items-center justify-between">
         <h1 class="text-2xl font-bold">My Bookmarks</h1>
       </div>
 
       <div v-if="starterkits.length === 0" class="p-8 text-center">
-        <p class="text-gray-500 mb-4">You haven't bookmarked any starterkits yet.</p>
+        <p class="mb-4 text-gray-500">You haven't bookmarked any starterkits yet.</p>
         <Link :href="route('starterkit.index')">
-        <Button>Browse Starterkits</Button>
+          <Button>Browse Starterkits</Button>
         </Link>
       </div>
 

@@ -1,17 +1,16 @@
 <script setup lang="ts">
-import AppLayout from '@/layouts/AppLayout.vue';
-import { type BreadcrumbItem } from '@/types';
-import { Head, useForm, router } from '@inertiajs/vue3';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Pencil, Trash2, Plus } from 'lucide-vue-next';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-vue-next';
+import AppLayout from '@/layouts/AppLayout.vue';
+import { type BreadcrumbItem } from '@/types';
+import { Head, router, useForm } from '@inertiajs/vue3';
+import { AlertCircle, Pencil, Plus, Trash2 } from 'lucide-vue-next';
 import { ref } from 'vue';
 
-const props = defineProps<{
+defineProps<{
   tags: Array<{ id: number; name: string }>;
 }>();
 
@@ -49,8 +48,7 @@ const deleteTag = (tagId: number) => {
   if (confirm('Are you sure you want to delete this tag?')) {
     router.delete(route('tags.destroy', tagId), {
       preserveScroll: true,
-      onSuccess: () => {
-      },
+      onSuccess: () => {},
     });
   }
 };
@@ -64,7 +62,6 @@ const breadcrumbs: BreadcrumbItem[] = [
 </script>
 
 <template>
-
   <Head title="Tags Management" />
   <AppLayout :breadcrumbs="breadcrumbs">
     <div class="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
@@ -85,7 +82,7 @@ const breadcrumbs: BreadcrumbItem[] = [
             <!-- Add validation error alert -->
             <Alert v-if="form.errors.name" variant="destructive">
               <AlertCircle class="h-4 w-4" />
-              <AlertDescription>{{ form.errors.name }}</AlertDescription>
+              <AlertDescription>{{ form.errors.name }} </AlertDescription>
             </Alert>
           </form>
 
@@ -101,13 +98,15 @@ const breadcrumbs: BreadcrumbItem[] = [
                 <TableCell>
                   <div v-if="editingTagId === tag.id" class="flex gap-2">
                     <Input v-model="editForm.name" class="max-w-[200px]" />
-                    <Button @click="updateTag(tag.id)" size="sm" :disabled="editForm.processing">Save</Button>
-                    <Button @click="editingTagId = null" size="sm" variant="outline">Cancel</Button>
+                    <Button @click="updateTag(tag.id)" size="sm" :disabled="editForm.processing"> Save </Button>
+                    <Button @click="editingTagId = null" size="sm" variant="outline"> Cancel </Button>
 
                     <!-- Add edit validation error alert -->
                     <Alert v-if="editForm.errors.name" variant="destructive" class="mt-2">
                       <AlertCircle class="h-4 w-4" />
-                      <AlertDescription>{{ editForm.errors.name }}</AlertDescription>
+                      <AlertDescription>
+                        {{ editForm.errors.name }}
+                      </AlertDescription>
                     </Alert>
                   </div>
                   <span v-else>{{ tag.name }}</span>
